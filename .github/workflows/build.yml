@@ -1,6 +1,9 @@
-name: ManualBuild
+name: CI
 
-on: workflow_dispatch
+on:
+  push:
+    branches:
+      - master
 
 jobs:
   build:
@@ -19,13 +22,16 @@ jobs:
         uses: actions/checkout@v2
         with:
           path: agbcc
-          repository: pret/agbcc
+          repository: kleeenexfeu/agbcc
+          # originally going to pret/agbcc but I cloned it
+
 
       - name: Install binutils
         run: sudo apt install gcc-arm-none-eabi binutils-arm-none-eabi
         # build-essential, git, and libpng-dev are already installed
         # gcc-arm-none-eabi is only needed for the modern build
         # as an alternative to dkP
+
       - name: Download poryscript
         run: cd tools && wget https://github.com/huderlem/poryscript/releases/download/3.3.0/poryscript-linux.zip && unzip poryscript-linux.zip -d ./ && rm ./poryscript-linux.zip && mv ./poryscript-linux ./poryscript && ls && cd ..
         # Downloads poryscript and unzips it
@@ -39,22 +45,18 @@ jobs:
       - name: Agbcc
         run: make -j${nproc} all
 
-      - name: Download pokeemerald repo
-        run: pwd && cd tools && git clone https://github.com/pret/pokeemerald
-        # Clones pokeemerald repo
-
-      - name: Install agbcc to vanilla emerald
-        run: pwd && cd tools && ls && cp -r agbcc pokeemerald/tools/ && cd pokeemerald && pwd
-
-      - name: Build pokeemerald repo
-        run: pwd && cd tools && cd pokeemerald && pwd && ls && make -j${nproc}
-        # builds agbcc to pokeemerald repo
-
-      - name: Build the patch
-        run: chmod -R 755 ./flips-linux && ls && ./flips-linux --create tools/pokeemerald/pokeemerald.gba pokeemerald.gba ROWE_Source.bps
-
-      - name: Upload bps file
-        uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v2
         with:
-          name: pokeemerald_patch
-          path: ROWE_Source.bps
+          name: rowe
+          path: rowe.gba
+          
+      - uses: actions/upload-artifact@v2
+        with:
+          name: rowe_elf
+          path: rowe.elf
+          
+      - uses: actions/upload-artifact@v2
+        with:
+          name: rowe_map
+          path: rowe.map
+
