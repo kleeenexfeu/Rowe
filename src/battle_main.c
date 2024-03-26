@@ -1831,6 +1831,7 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
     u32 personalityValue;
     u8 fixedIV;
     s32 i, j;
+    u8 isMonFromTrainer = 1;
     u8 monsCount;
 	u8 numBadges = GetNumBadges();
 	u8 TrainerMonsCount = getTrainerPokemonNum();
@@ -2042,6 +2043,7 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
 				if(numBadges >= 5){
 					abilityNum = Random() % 3;
 					if(GetAbilityBySpecies(newspecies, abilityNum, formId) != ABILITY_NONE && abilityNum != 3)
+                    // ^ should be ok to not load it with GetMonAbility
 						SetMonData(&party[i], MON_DATA_ABILITY_NUM, &abilityNum);
 					else
 						abilityNum = 0;
@@ -2070,11 +2072,13 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
 				   canMega = TRUE;
 				
 				PokemonHeldItem[i] = GetRandomItem(newspecies, GetAbilityBySpecies(newspecies, abilityNum, formId), i, canMega);
+                // ^ should be ok to not load it with GetMonAbility
 				
 				if(numBadges >= 8)
 					SetMonData(&party[i], MON_DATA_HELD_ITEM, &PokemonHeldItem[i]);
 
-                CalculateTrainerMonStats(&party[i]);
+                SetMonData(&party[i], MON_DATA_IS_TRAINER_MON, &isMonFromTrainer);
+                CalculateMonStats(&party[i]);
 				
 				break;
             }
@@ -2191,7 +2195,8 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
                 if(FlagGet(FLAG_MGBA_PRINT_ENABLED))
 					mgba_printf(MGBA_LOG_WARN, "Mon Data %d", &party[i]);
 				
-                CalculateTrainerMonStats(&party[i]);
+                SetMonData(&party[i], MON_DATA_IS_TRAINER_MON, &isMonFromTrainer);
+                CalculateMonStats(&party[i]);
 				
                 break;
             }
@@ -2278,7 +2283,8 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
 					}
 				}
 				
-                CalculateTrainerMonStats(&party[i]);
+                SetMonData(&party[i], MON_DATA_IS_TRAINER_MON, &isMonFromTrainer);
+                CalculateMonStats(&party[i]);
 			
                 break;
 				
@@ -2478,7 +2484,8 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
 					}
                 }
 				
-                CalculateTrainerMonStats(&party[i]);
+                SetMonData(&party[i], MON_DATA_IS_TRAINER_MON, &isMonFromTrainer);
+                CalculateMonStats(&party[i]);
 				break;
             }
             }
@@ -3770,7 +3777,7 @@ void FaintClearSetData(void)
 
     gBattleMons[gActiveBattler].type3   = GetThirdTypeFromPersonality(gBattleMons[gActiveBattler].personality, gBattleMons[gActiveBattler].type1, gBattleMons[gActiveBattler].type2);
     gBattleMons[gActiveBattler].ability = RandomizePokemonAbility(GetAbilityBySpecies(gBattleMons[gActiveBattler].species, gBattleMons[gActiveBattler].abilityNum, gBattleMons[gActiveBattler].formId), gBattleMons[gActiveBattler].personality);
-
+    // ^ should be ok to not load it with GetMonAbility, types too
     ClearBattlerMoveHistory(gActiveBattler);
     ClearBattlerAbilityHistory(gActiveBattler);
     UndoFormChange(gBattlerPartyIndexes[gActiveBattler], GET_BATTLER_SIDE(gActiveBattler));
@@ -3828,17 +3835,12 @@ static void DoBattleIntro(void)
                 memcpy(&gBattleMons[gActiveBattler], &gBattleResources->bufferB[gActiveBattler][4], sizeof(struct BattlePokemon));
                 formSpeciesId = GetFormSpeciesId(gBattleMons[gActiveBattler].species, gBattleMons[gActiveBattler].formId);
 
-                if(!FlagGet(FLAG_VANILLA_MODE)){
-                    gBattleMons[gActiveBattler].type1 = RandomizePokemonType(gBaseStats[formSpeciesId].type1, gBattleMons[gActiveBattler].personality, FALSE);
-                    gBattleMons[gActiveBattler].type2 = RandomizePokemonType(gBaseStats[formSpeciesId].type2, gBattleMons[gActiveBattler].personality, TRUE);
-                }
-                else{
-                    gBattleMons[gActiveBattler].type1 = RandomizePokemonType(gVanillaBaseStats[formSpeciesId].type1, gBattleMons[gActiveBattler].personality, FALSE);
-                    gBattleMons[gActiveBattler].type2 = RandomizePokemonType(gVanillaBaseStats[formSpeciesId].type2, gBattleMons[gActiveBattler].personality, TRUE);
-                }
+                gBattleMons[gActiveBattler].type1 = RandomizePokemonType(GetMonData(GetBattlerPartyData(gActiveBattler), MON_DATA_TYPE1, NULL), gBattleMons[gActiveBattler].personality, FALSE);
+                gBattleMons[gActiveBattler].type2 = RandomizePokemonType(GetMonData(GetBattlerPartyData(gActiveBattler), MON_DATA_TYPE2, NULL), gBattleMons[gActiveBattler].personality, TRUE);
+
 
                 gBattleMons[gActiveBattler].type3   = GetThirdTypeFromPersonality(gBattleMons[gActiveBattler].personality, gBattleMons[gActiveBattler].type1, gBattleMons[gActiveBattler].type2);
-                gBattleMons[gActiveBattler].ability = RandomizePokemonAbility(GetAbilityBySpecies(gBattleMons[gActiveBattler].species, gBattleMons[gActiveBattler].abilityNum, gBattleMons[gActiveBattler].formId), gBattleMons[gActiveBattler].personality);
+                gBattleMons[gActiveBattler].ability = RandomizePokemonAbility(GetMonAbility(GetBattlerPartyData(gActiveBattler)), gBattleMons[gActiveBattler].personality);
                 
                 gBattleStruct->hpOnSwitchout[GetBattlerSide(gActiveBattler)] = gBattleMons[gActiveBattler].hp;
                 gBattleMons[gActiveBattler].status2 = 0;

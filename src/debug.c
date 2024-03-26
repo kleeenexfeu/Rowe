@@ -2247,6 +2247,7 @@ static void DebugAction_Give_Pokemon_SelectNature(u8 taskId)
         ConvertIntToDecimalStringN(gStringVar3, gTasks[taskId].data[3], STR_CONV_MODE_LEADING_ZEROS, 2);
         StringCopyPadded(gStringVar3, gStringVar3, CHAR_SPACE, 15);
         abilityId = GetAbilityBySpecies(sDebugMonData->mon_speciesId, 0, GetFormIdFromFormSpeciesId(sDebugMonData->mon_speciesId));
+        // ^ should be ok to not load it with GetMonAbility
         StringCopy(gStringVar1, gAbilityNames[abilityId]);
         StringExpandPlaceholders(gStringVar4, gDebugText_PokemonAbility);
         AddTextPrinterParameterized(gTasks[taskId].data[2], 1, gStringVar4, 1, 1, 0, NULL);
@@ -2288,6 +2289,7 @@ static void DebugAction_Give_Pokemon_SelectAbility(u8 taskId)
         }
 
         abilityId = GetAbilityBySpecies(sDebugMonData->mon_speciesId, gTasks[taskId].data[3], GetFormIdFromFormSpeciesId(sDebugMonData->mon_speciesId));
+        // ^ should be ok to not load it with GetMonAbility
         StringCopy(gStringVar2, gText_DigitIndicator[gTasks[taskId].data[4]]);
         ConvertIntToDecimalStringN(gStringVar3, gTasks[taskId].data[3], STR_CONV_MODE_LEADING_ZEROS, 2);
         StringCopyPadded(gStringVar3, gStringVar3, CHAR_SPACE, 15);
@@ -2647,10 +2649,12 @@ static void DebugAction_Give_Pokemon_ComplexCreateMon(u8 taskId) //https://githu
 
     //Ability
     if (abilityNum == 0xFF || GetAbilityBySpecies(species, abilityNum, formId) == 0)
+    // ^ should be ok to not load it with GetMonAbility
     {
         do {
             abilityNum = Random() % 3;  // includes hidden abilities
         } while (GetAbilityBySpecies(species, abilityNum, formId) == 0);
+        // ^ should be ok to not load it with GetMonAbility
     }
 
     SetMonData(&mon, MON_DATA_ABILITY_NUM, &abilityNum);
@@ -2740,6 +2744,18 @@ struct CompressedPokemon partyToCompressedPokemon(u8 num){
     CompressedPokemon.abilityNum  = GetMonData(mon, MON_DATA_ABILITY_NUM, NULL);
     CompressedPokemon.pokeball    = GetMonData(mon, MON_DATA_POKEBALL, NULL);
 
+    CompressedPokemon.customAbility = GetMonData(mon, MON_DATA_CUSTOM_ABILITY, NULL);
+    CompressedPokemon.customHp    = GetMonData(mon, MON_DATA_CUSTOM_HP, NULL);
+    CompressedPokemon.customAtk   = GetMonData(mon, MON_DATA_CUSTOM_ATK, NULL);
+
+    CompressedPokemon.customDef   = GetMonData(mon, MON_DATA_CUSTOM_DEF, NULL);
+    CompressedPokemon.customSpeed = GetMonData(mon, MON_DATA_CUSTOM_SPEED, NULL);
+    CompressedPokemon.customSpAtk = GetMonData(mon, MON_DATA_CUSTOM_SPATK, NULL);
+    CompressedPokemon.customSpDef = GetMonData(mon, MON_DATA_CUSTOM_SPDEF, NULL);
+
+    CompressedPokemon.customType1 = GetMonData(mon, MON_DATA_CUSTOM_TYPE1, NULL);
+    CompressedPokemon.customType2 = GetMonData(mon, MON_DATA_CUSTOM_TYPE2, NULL);
+
     memcpy(to, &CompressedPokemon, sizeof(to));
     //mgba_printf(MGBA_LOG_WARN, "CompressedPokemon Size %d", sizeof(CompressedPokemon));
     //Sends the data to the Companion App
@@ -2787,6 +2803,7 @@ struct Pokemon CreateMonFromCompressedPokemon(struct CompressedPokemon Compresse
     u16 moves3      = CompressedPokemon.moves3;
     u16 moves4      = CompressedPokemon.moves4;
     u8 abilityNum   = CompressedPokemon.abilityNum;
+    u16 abilityCustom   = CompressedPokemon.customAbility;
     u8 pokeball     = CompressedPokemon.pokeball;
 
     CreateMon(&mon, species, level, 32, 1, personality, OT_ID_PRESET, otid, formId);
@@ -2815,6 +2832,18 @@ struct Pokemon CreateMonFromCompressedPokemon(struct CompressedPokemon Compresse
     SetMonData(&mon, MON_DATA_POKEBALL,         &pokeball);
     SetMonData(&mon, MON_DATA_OT_GENDER,        &otGender);
     SetMonData(&mon, MON_DATA_OT_NAME,          &CompressedPokemon.otName);
+
+    SetMonData(&mon, MON_DATA_CUSTOM_ABILITY, &abilityCustom);
+    SetMonData(&mon, MON_DATA_CUSTOM_HP, &CompressedPokemon.customHp);
+    SetMonData(&mon, MON_DATA_CUSTOM_ATK , &CompressedPokemon.customAtk);
+
+    SetMonData(&mon, MON_DATA_CUSTOM_DEF , &CompressedPokemon.customDef);
+    SetMonData(&mon, MON_DATA_CUSTOM_SPEED , &CompressedPokemon.customSpeed);
+    SetMonData(&mon, MON_DATA_CUSTOM_SPATK , &CompressedPokemon.customSpAtk);
+    SetMonData(&mon, MON_DATA_CUSTOM_SPDEF , &CompressedPokemon.customSpDef);
+
+    SetMonData(&mon, MON_DATA_CUSTOM_TYPE1 , &CompressedPokemon.customType1);
+    SetMonData(&mon, MON_DATA_CUSTOM_TYPE2 , &CompressedPokemon.customType2);
 
     for (i = 0; i < PARTY_SIZE; i++)
     {

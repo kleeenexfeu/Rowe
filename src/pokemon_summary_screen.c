@@ -2561,7 +2561,8 @@ static void PrintInfoPage_Bottom(void)
     //Pokemon Ability Name
 	PosY = PosY + 12;
 	abilityNum = sMonSummaryScreen->summary.abilityNum;
-	ability = RandomizePokemonAbility(GetAbilityBySpecies(sMonSummaryScreen->summary.species, sMonSummaryScreen->summary.abilityNum, sMonSummaryScreen->summary.formId), sMonSummaryScreen->summary.pid);
+
+	ability = RandomizePokemonAbility(GetMonAbility(mon), sMonSummaryScreen->summary.pid);
     
     StringCopy(gStringVar1, gAbilityNames[ability]);
     //StringExpandPlaceholders(gStringVar4, gText_Ability);
@@ -2859,8 +2860,8 @@ static void PrintStatPage_Bottom(void)
     struct Pokemon *mon = &sMonSummaryScreen->currentMon;
     struct PokeSummary *summary = &sMonSummaryScreen->summary;
     u16 formSpeciesId = GetFormSpeciesId(summary->species, summary->formId);
-    u8 type1 = RandomizePokemonType(gVanillaBaseStats[formSpeciesId].type1, summary->pid, FALSE);
-    u8 type2 = RandomizePokemonType(gVanillaBaseStats[formSpeciesId].type2, summary->pid, TRUE);
+    u8 type1 = RandomizePokemonType(GetMonData(mon, MON_DATA_TYPE1, NULL), summary->pid, FALSE);
+    u8 type2 = RandomizePokemonType(GetMonData(mon, MON_DATA_TYPE2, NULL), summary->pid, TRUE);
     const u8 gText_Other_Info[]   = _("Other Info:");
     const u8 gText_Hidden_Power[] = _("HP Type: {STR_VAR_1}");
     const u8 gText_Friendship[]   = _("Friendship: {STR_VAR_1}%");
@@ -4337,7 +4338,6 @@ static void PrintMoveDetails(u16 move)
     struct PokeSummary *summary = &sMonSummaryScreen->summary;
     struct Pokemon *mon = &sMonSummaryScreen->currentMon;
     u16 speciesId = GetFormSpeciesId(summary->species, summary->formId);
-    u16 ability = RandomizePokemonAbility(GetAbilityBySpecies(sMonSummaryScreen->summary.species, sMonSummaryScreen->summary.abilityNum, sMonSummaryScreen->summary.formId), sMonSummaryScreen->summary.pid);
     u16 PosX = (9 * 8) + 14;
     u16 PosY = 9;
 
@@ -4482,14 +4482,10 @@ static void SetMonTypeIcons(void)
 {
 	//Pokemon Type
     struct PokeSummary *summary = &sMonSummaryScreen->summary;
+    struct Pokemon *mon = &sMonSummaryScreen->currentMon;
     u16 formSpeciesId = GetFormSpeciesId(summary->species, summary->formId);
-    u8 type1 = RandomizePokemonType(gBaseStats[formSpeciesId].type1, summary->pid, FALSE);
-    u8 type2 = RandomizePokemonType(gBaseStats[formSpeciesId].type2, summary->pid, TRUE);
-
-    if(FlagGet(FLAG_VANILLA_MODE)){
-        type1 = RandomizePokemonType(gVanillaBaseStats[formSpeciesId].type1, summary->pid, FALSE);
-        type2 = RandomizePokemonType(gVanillaBaseStats[formSpeciesId].type2, summary->pid, TRUE);
-    }
+    u8 type1 = RandomizePokemonType(GetMonData(mon, MON_DATA_TYPE1, NULL), summary->pid, FALSE);
+    u8 type2 = RandomizePokemonType(GetMonData(mon, MON_DATA_TYPE2, NULL), summary->pid, TRUE);
 
     if (summary->isEgg)
     {
@@ -4519,7 +4515,7 @@ static void SetMoveTypeIcons(void)
     u16 species = sMonSummaryScreen->summary.species;
     u8  formID = sMonSummaryScreen->summary.formId;
     u16 speciesId = GetFormSpeciesId(species, formID);
-    u16 ability = RandomizePokemonAbility(GetAbilityBySpecies(sMonSummaryScreen->summary.species, sMonSummaryScreen->summary.abilityNum, sMonSummaryScreen->summary.formId), sMonSummaryScreen->summary.pid);
+    u16 ability = RandomizePokemonAbility(GetMonAbility(mon), sMonSummaryScreen->summary.pid);
 
     for (i = 0; i < MAX_MON_MOVES; i++)
     {

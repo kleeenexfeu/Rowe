@@ -1594,13 +1594,6 @@ static u8 CheckValidityOfTradeMons(u8 *aliveMons, u8 playerPartyCount, u8 player
     if (partnerSpecies == SPECIES_NONE)
         return PARTNER_MON_INVALID;
 
-    // Partner cant trade illegitimate Deoxys or Mew
-    if (partnerSpecies == SPECIES_DEOXYS || partnerSpecies == SPECIES_MEW)
-    {
-        if (!GetMonData(&gEnemyParty[partnerMonIdx], MON_DATA_OBEDIENCE))
-            return PARTNER_MON_INVALID;
-    }
-
     // Partner cant trade Egg or non-Hoenn mon if player doesn't have National Dex
     if (!IsNationalPokedexEnabled())
     {
@@ -2435,12 +2428,6 @@ static u32 CanTradeSelectedMon(struct Pokemon *playerParty, int partyCount, int 
         }
     }
 
-    if (species[monIdx] == SPECIES_DEOXYS || species[monIdx] == SPECIES_MEW)
-    {
-        if (!GetMonData(&playerParty[monIdx], MON_DATA_OBEDIENCE))
-            return CANT_TRADE_INVALID_MON;
-    }
-
     // Make Eggs not count for numMonsLeft
     for (i = 0; i < partyCount; i++)
     {
@@ -2502,16 +2489,6 @@ s32 GetGameProgressForLinkTrade(void)
     return TRADE_BOTH_PLAYERS_READY;
 }
 
-static bool32 IsDeoxysOrMewUntradable(u16 species, bool8 isObedientBitSet)
-{
-    if (species == SPECIES_DEOXYS || species == SPECIES_MEW)
-    {
-        if (!isObedientBitSet)
-            return TRUE;
-    }
-    return FALSE;
-}
-
 int GetUnionRoomTradeMessageId(struct GFtgtGnameSub rfuPlayer, struct GFtgtGnameSub rfuPartner, u16 playerSpecies2, u16 partnerSpecies, u8 requestedType, u16 playerSpecies, u8 isObedientBitSet)
 {
     bool8 playerHasNationalDex = rfuPlayer.hasNationalDex;
@@ -2555,11 +2532,6 @@ int GetUnionRoomTradeMessageId(struct GFtgtGnameSub rfuPlayer, struct GFtgtGname
         {
             return UR_TRADE_MSG_CANT_TRADE_WITH_PARTNER_2;
         }
-    }
-
-    if (IsDeoxysOrMewUntradable(playerSpecies, isObedientBitSet))
-    {
-        return UR_TRADE_MSG_MON_CANT_BE_TRADED_2;
     }
 
     if (partnerSpecies == SPECIES_EGG)
@@ -2616,9 +2588,6 @@ int GetUnionRoomTradeMessageId(struct GFtgtGnameSub rfuPlayer, struct GFtgtGname
 int CanRegisterMonForTradingBoard(struct GFtgtGnameSub rfuPlayer, u16 species2, u16 species, u8 isObedientBitSet)
 {
     bool8 hasNationalDex = rfuPlayer.hasNationalDex;
-
-    if (IsDeoxysOrMewUntradable(species, isObedientBitSet))
-        return CANT_REGISTER_MON;
 
     if (hasNationalDex)
         return CAN_REGISTER_MON;

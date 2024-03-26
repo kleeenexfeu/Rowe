@@ -6759,17 +6759,9 @@ static void InitCanRelaseMonVars(void)
     }
 
     sub_80CE350(sStorage->restrictedMoveList);
-    sStorage->restrictedReleaseMonMoves = GetMonData(&sStorage->tempMon, MON_DATA_KNOWN_MOVES, (u8*)sStorage->restrictedMoveList);
-    if (sStorage->restrictedReleaseMonMoves != 0)
-    {
-        sStorage->releaseStatusResolved = 0;
-    }
-    else
-    {
-        sStorage->releaseStatusResolved = 1;
-        sStorage->canReleaseMon = 1;
-    }
 
+    sStorage->releaseStatusResolved = 1;
+    sStorage->canReleaseMon = 1;
     sStorage->releaseCheckState = 0;
 }
 
@@ -6804,62 +6796,11 @@ static bool32 AtLeastThreeUsableMons(void)
 
 static s8 RunCanReleaseMon(void)
 {
-    u16 i;
-    u16 knownMoves;
-
     if (sStorage->releaseStatusResolved)
         return sStorage->canReleaseMon;
 
-    switch (sStorage->releaseCheckState)
-    {
-    case 0:
-        for (i = 0; i < PARTY_SIZE; i++)
-        {
-            if (sStorage->releaseBoxId != TOTAL_BOXES_COUNT || sStorage->releaseBoxPos != i)
-            {
-                knownMoves = GetMonData(gPlayerParty + i, MON_DATA_KNOWN_MOVES, (u8*)sStorage->restrictedMoveList);
-                sStorage->restrictedReleaseMonMoves &= ~(knownMoves);
-            }
-        }
-        if (sStorage->restrictedReleaseMonMoves == 0)
-        {
-            sStorage->releaseStatusResolved = 1;
-            sStorage->canReleaseMon = 1;
-        }
-        else
-        {
-            sStorage->releaseCheckBoxId = 0;
-            sStorage->releaseCheckBoxPos = 0;
-            sStorage->releaseCheckState++;
-        }
-        break;
-    case 1:
-        for (i = 0; i < IN_BOX_COUNT; i++)
-        {
-            knownMoves = GetAndCopyBoxMonDataAt(sStorage->releaseCheckBoxId, sStorage->releaseCheckBoxPos, MON_DATA_KNOWN_MOVES, (u8*)sStorage->restrictedMoveList);
-            if (knownMoves != 0
-                && !(sStorage->releaseBoxId == sStorage->releaseCheckBoxId && sStorage->releaseBoxPos == sStorage->releaseCheckBoxPos))
-            {
-                sStorage->restrictedReleaseMonMoves &= ~(knownMoves);
-                if (sStorage->restrictedReleaseMonMoves == 0)
-                {
-                    sStorage->releaseStatusResolved = 1;
-                    sStorage->canReleaseMon = 1;
-                    break;
-                }
-            }
-            if (++sStorage->releaseCheckBoxPos >= IN_BOX_COUNT)
-            {
-                sStorage->releaseCheckBoxPos = 0;
-                if (++sStorage->releaseCheckBoxId >= TOTAL_BOXES_COUNT)
-                {
-                    sStorage->releaseStatusResolved = 1;
-                    sStorage->canReleaseMon = 0;
-                }
-            }
-        }
-        break;
-    }
+    sStorage->releaseStatusResolved = 1;
+    sStorage->canReleaseMon = 1;
 
     return -1;
 }
@@ -7038,8 +6979,7 @@ void SetArceusFormPSS(struct BoxPokemon *boxMon)
 	u16 formid = GetMonData(boxMon, MON_DATA_FORM_ID);
 	u16 newformid;
     u16 forme;
-    u8 abilityNum = GetMonData(boxMon, MON_DATA_ABILITY_NUM);
-    u16 ability = GetAbilityBySpecies(species, abilityNum, formid);
+    u16 ability = GetBoxMonData(boxMon, MON_DATA_ABILITY, NULL);
 
     if (species == SPECIES_ARCEUS
      && ability == ABILITY_MULTITYPE)
@@ -9915,25 +9855,6 @@ u32 CountAllStorageMons(void)
     return count;
 }
 
-bool32 AnyStorageMonWithMove(u16 moveId)
-{
-    u16 moves[] = {moveId, MOVES_COUNT};
-    s32 i, j;
-
-    for (i = 0; i < TOTAL_BOXES_COUNT; i++)
-    {
-        for (j = 0; j < IN_BOX_COUNT; j++)
-        {
-            if (GetBoxMonData(&gPokemonStoragePtr->boxes[i][j], MON_DATA_SANITY_HAS_SPECIES)
-                && !GetBoxMonData(&gPokemonStoragePtr->boxes[i][j], MON_DATA_SANITY_IS_EGG)
-                && GetBoxMonData(&gPokemonStoragePtr->boxes[i][j], MON_DATA_KNOWN_MOVES, (u8*)moves))
-                return TRUE;
-        }
-    }
-
-    return FALSE;
-}
-
 void ResetWaldaWallpaper(void)
 {
     gSaveBlock1Ptr->waldaPhrase.iconId = 0;
@@ -10327,6 +10248,18 @@ void SendPartyMonToDB(u8 position){
     CompressedPokemon.abilityNum  = GetMonData(mon, MON_DATA_ABILITY_NUM, NULL);
     CompressedPokemon.pokeball    = GetMonData(mon, MON_DATA_POKEBALL, NULL);
 
+    CompressedPokemon.customAbility = GetMonData(mon, MON_DATA_CUSTOM_ABILITY, NULL);
+    CompressedPokemon.customHp    = GetMonData(mon, MON_DATA_CUSTOM_HP, NULL);
+    CompressedPokemon.customAtk   = GetMonData(mon, MON_DATA_CUSTOM_ATK, NULL);
+
+    CompressedPokemon.customDef   = GetMonData(mon, MON_DATA_CUSTOM_DEF, NULL);
+    CompressedPokemon.customSpeed = GetMonData(mon, MON_DATA_CUSTOM_SPEED, NULL);
+    CompressedPokemon.customSpAtk = GetMonData(mon, MON_DATA_CUSTOM_SPATK, NULL);
+    CompressedPokemon.customSpDef = GetMonData(mon, MON_DATA_CUSTOM_SPDEF, NULL);
+
+    CompressedPokemon.customType1 = GetMonData(mon, MON_DATA_CUSTOM_TYPE1, NULL);
+    CompressedPokemon.customType2 = GetMonData(mon, MON_DATA_CUSTOM_TYPE2, NULL);
+
     memcpy(to, &CompressedPokemon, sizeof(to));
     mgba_printf(MGBA_LOG_WARN, "InsertMon:%d:%d:%d:Nickname:%d:%d:%d:%d:%d:%d:%d:%d:%d:%d:%d:%d:%d:%d:%d:%d:%d:%d", CompressedPokemon.species, CompressedPokemon.level, IsMonShiny(mon), to[0],to[1],to[2],to[3],to[4],to[5],to[6],to[7],to[8],to[9],to[10],to[11],to[12],to[13],to[14],to[15],to[16],to[17],to[18]);
 }
@@ -10369,6 +10302,19 @@ void SendBoxMonToDB(u8 boxId, u8 boxPosition){
     CompressedPokemon.abilityNum  = GetMonData(&pokemon, MON_DATA_ABILITY_NUM, NULL);
     CompressedPokemon.pokeball    = GetMonData(&pokemon, MON_DATA_POKEBALL, NULL);
 
+
+    CompressedPokemon.customAbility = GetMonData(&pokemon, MON_DATA_CUSTOM_ABILITY, NULL);
+    CompressedPokemon.customHp    = GetMonData(&pokemon, MON_DATA_CUSTOM_HP, NULL);
+    CompressedPokemon.customAtk   = GetMonData(&pokemon, MON_DATA_CUSTOM_ATK, NULL);
+
+    CompressedPokemon.customDef   = GetMonData(&pokemon, MON_DATA_CUSTOM_DEF, NULL);
+    CompressedPokemon.customSpeed = GetMonData(&pokemon, MON_DATA_CUSTOM_SPEED, NULL);
+    CompressedPokemon.customSpAtk = GetMonData(&pokemon, MON_DATA_CUSTOM_SPATK, NULL);
+    CompressedPokemon.customSpDef = GetMonData(&pokemon, MON_DATA_CUSTOM_SPDEF, NULL);
+
+    CompressedPokemon.customType1 = GetMonData(&pokemon, MON_DATA_CUSTOM_TYPE1, NULL);
+    CompressedPokemon.customType2 = GetMonData(&pokemon, MON_DATA_CUSTOM_TYPE2, NULL);
+
     memcpy(to, &CompressedPokemon, sizeof(to));
     mgba_printf(MGBA_LOG_WARN,"InsertMon:%d:%d:%d:Nickname:%d:%d:%d:%d:%d:%d:%d:%d:%d:%d:%d:%d:%d:%d:%d:%d:%d:%d", CompressedPokemon.species, CompressedPokemon.level, IsMonShiny(&pokemon), to[0],to[1],to[2],to[3],to[4],to[5],to[6],to[7],to[8],to[9],to[10],to[11],to[12],to[13],to[14],to[15],to[16],to[17],to[18]);
 }
@@ -10407,6 +10353,7 @@ bool8 GiveCompressedPokemon(struct CompressedPokemon CompressedPokemon){
     u16 moves4      = CompressedPokemon.moves4;
     u8 abilityNum   = CompressedPokemon.abilityNum;
     u8 pokeball     = CompressedPokemon.pokeball;
+    u16 abilityCustom = CompressedPokemon.customAbility;
 
     CreateMon(&mon, species, level, 32, 1, personality, OT_ID_PRESET, otid, formId);
 
@@ -10435,6 +10382,18 @@ bool8 GiveCompressedPokemon(struct CompressedPokemon CompressedPokemon){
     SetMonData(&mon, MON_DATA_OT_GENDER,        &otGender);
     SetMonData(&mon, MON_DATA_OT_NAME,          &CompressedPokemon.otName);
 
+    SetMonData(&mon, MON_DATA_CUSTOM_ABILITY, &abilityCustom);
+    SetMonData(&mon, MON_DATA_CUSTOM_HP, &CompressedPokemon.customHp);
+    SetMonData(&mon, MON_DATA_CUSTOM_ATK , &CompressedPokemon.customAtk);
+
+    SetMonData(&mon, MON_DATA_CUSTOM_DEF , &CompressedPokemon.customDef);
+    SetMonData(&mon, MON_DATA_CUSTOM_SPEED , &CompressedPokemon.customSpeed);
+    SetMonData(&mon, MON_DATA_CUSTOM_SPATK , &CompressedPokemon.customSpAtk);
+    SetMonData(&mon, MON_DATA_CUSTOM_SPDEF , &CompressedPokemon.customSpDef);
+
+    SetMonData(&mon, MON_DATA_CUSTOM_TYPE1 , &CompressedPokemon.customType1);
+    SetMonData(&mon, MON_DATA_CUSTOM_TYPE2 , &CompressedPokemon.customType2);
+    
     for (i = 0; i < PARTY_SIZE; i++)
     {
         if (GetMonData(&gPlayerParty[i], MON_DATA_SPECIES, NULL) == SPECIES_NONE)

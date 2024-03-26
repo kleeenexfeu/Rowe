@@ -1313,8 +1313,7 @@ void IsGrassTypeInParty(void)
         pokemon = &gPlayerParty[i];
         if (GetMonData(pokemon, MON_DATA_SANITY_HAS_SPECIES) && !GetMonData(pokemon, MON_DATA_IS_EGG))
         {
-            species = GetMonData(pokemon, MON_DATA_SPECIES);
-            if (gBaseStats[species].type1 == TYPE_GRASS || gBaseStats[species].type2 == TYPE_GRASS)
+            if (GetMonData(pokemon, MON_DATA_TYPE1) == TYPE_GRASS || GetMonData(pokemon, MON_DATA_TYPE2) == TYPE_GRASS)
             {
                 gSpecialVar_Result = TRUE;
                 return;
@@ -1448,7 +1447,7 @@ void GiveLeadMonEffortRibbon(void)
     ribbonSet = TRUE;
     leadMon = &gPlayerParty[GetLeadMonIndex()];
     SetMonData(leadMon, MON_DATA_EFFORT_RIBBON, &ribbonSet);
-    if (GetRibbonCount(leadMon) > NUM_CUTIES_RIBBONS)
+    if (GetMonData(leadMon, MON_DATA_RIBBON_COUNT, NULL) > NUM_CUTIES_RIBBONS)
     {
         TryPutSpotTheCutiesOnAir(leadMon, 0x47);
     }

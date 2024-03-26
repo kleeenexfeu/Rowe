@@ -1438,20 +1438,6 @@ static void Cmd_attackcanceler(void)
     #endif
 
     gHitMarker &= ~(HITMARKER_x800000);
-    if (!(gHitMarker & HITMARKER_OBEYS) && !(gBattleMons[gBattlerAttacker].status2 & STATUS2_MULTIPLETURNS))
-    {
-        switch (IsMonDisobedient())
-        {
-        case 0:
-            break;
-        case 2:
-            gHitMarker |= HITMARKER_OBEYS;
-            return;
-        default:
-            gMoveResultFlags |= MOVE_RESULT_MISSED;
-            return;
-        }
-    }
 
     gHitMarker |= HITMARKER_OBEYS;
     if (NoTargetPresent(gCurrentMove))
@@ -5441,21 +5427,12 @@ static void Cmd_switchindataupdate(void)
     {
         monData[i] = gBattleResources->bufferB[gActiveBattler][4 + i];
     }
-
-    formSpeciesId = GetFormSpeciesId(gBattleMons[gActiveBattler].species, gBattleMons[gActiveBattler].formId);
-
-    if(!FlagGet(FLAG_VANILLA_MODE)){
-        gBattleMons[gActiveBattler].type1 = RandomizePokemonType(gBaseStats[formSpeciesId].type1, gBattleMons[gActiveBattler].personality, FALSE);
-        gBattleMons[gActiveBattler].type2 = RandomizePokemonType(gBaseStats[formSpeciesId].type2, gBattleMons[gActiveBattler].personality, TRUE);
-    }
-    else{
-        gBattleMons[gActiveBattler].type1 = RandomizePokemonType(gVanillaBaseStats[formSpeciesId].type1, gBattleMons[gActiveBattler].personality, FALSE);
-        gBattleMons[gActiveBattler].type2 = RandomizePokemonType(gVanillaBaseStats[formSpeciesId].type2, gBattleMons[gActiveBattler].personality, TRUE);
-    }
-
+    
+    gBattleMons[gActiveBattler].type1 = RandomizePokemonType(GetMonData(GetBattlerPartyData(gActiveBattler), MON_DATA_TYPE1, NULL), gBattleMons[gActiveBattler].personality, FALSE);
+    gBattleMons[gActiveBattler].type2 = RandomizePokemonType(GetMonData(GetBattlerPartyData(gActiveBattler), MON_DATA_TYPE2, NULL), gBattleMons[gActiveBattler].personality, TRUE);
     gBattleMons[gActiveBattler].type3   = GetThirdTypeFromPersonality(gBattleMons[gActiveBattler].personality, gBattleMons[gActiveBattler].type1, gBattleMons[gActiveBattler].type2);
-    gBattleMons[gActiveBattler].ability = RandomizePokemonAbility(GetAbilityBySpecies(gBattleMons[gActiveBattler].species, gBattleMons[gActiveBattler].abilityNum, gBattleMons[gActiveBattler].formId), gBattleMons[gActiveBattler].personality);
-
+    gBattleMons[gActiveBattler].ability = RandomizePokemonAbility(GetMonAbility(GetBattlerPartyData(gActiveBattler)), gBattleMons[gActiveBattler].personality);
+                
     // check knocked off item
     i = GetBattlerSide(gActiveBattler);
     if (gWishFutureKnock.knockedOffMons[i] & gBitTable[gBattlerPartyIndexes[gActiveBattler]])
@@ -7435,17 +7412,10 @@ static void RecalcBattlerStats(u32 battler, struct Pokemon *mon)
     gBattleMons[battler].spAttack = GetMonData(mon, MON_DATA_SPATK);
     gBattleMons[battler].spDefense = GetMonData(mon, MON_DATA_SPDEF);
 
-    if(!FlagGet(FLAG_VANILLA_MODE)){
-        gBattleMons[battler].type1 = RandomizePokemonType(gBaseStats[formSpeciesId].type1, gBattleMons[battler].personality, FALSE);
-        gBattleMons[battler].type2 = RandomizePokemonType(gBaseStats[formSpeciesId].type2, gBattleMons[battler].personality, TRUE);
-    }
-    else{
-        gBattleMons[battler].type1 = RandomizePokemonType(gVanillaBaseStats[formSpeciesId].type1, gBattleMons[battler].personality, FALSE);
-        gBattleMons[battler].type2 = RandomizePokemonType(gVanillaBaseStats[formSpeciesId].type2, gBattleMons[battler].personality, TRUE);
-    }
-
+    gBattleMons[battler].type1 = RandomizePokemonType(GetMonData(GetBattlerPartyData(battler), MON_DATA_TYPE1, NULL), gBattleMons[battler].personality, FALSE);
+    gBattleMons[battler].type2 = RandomizePokemonType(GetMonData(GetBattlerPartyData(battler), MON_DATA_TYPE2, NULL), gBattleMons[battler].personality, TRUE);
     gBattleMons[battler].type3   = GetThirdTypeFromPersonality(gBattleMons[battler].personality, gBattleMons[battler].type1, gBattleMons[battler].type2);
-    gBattleMons[battler].ability = RandomizePokemonAbility(GetAbilityBySpecies(gBattleMons[battler].species, gBattleMons[battler].abilityNum, gBattleMons[battler].formId), gBattleMons[gActiveBattler].personality);
+    gBattleMons[battler].ability = RandomizePokemonAbility(GetMonAbility(GetBattlerPartyData(battler)), gBattleMons[battler].personality);
 }
 
 static u32 GetHighestStatId(u32 battlerId)
@@ -10895,7 +10865,7 @@ static void Cmd_healpartystatus(void)
                          && !(gAbsentBattlerFlags & gBitTable[gActiveBattler]))
                     ability = gBattleMons[gActiveBattler].ability;
                 else
-                    ability = GetAbilityBySpecies(species, abilityNum, formId);
+                    ability = GetMonAbility(&party[i]);
 
                 if (ability != ABILITY_SOUNDPROOF)
                     toHeal |= (1 << i);

@@ -1980,7 +1980,7 @@ void GiveMonContestRibbon(void)
         {
             ribbonData++;
             SetMonData(&gPlayerParty[gContestMonPartyIndex], MON_DATA_COOL_RIBBON, &ribbonData);
-            if (GetRibbonCount(&gPlayerParty[gContestMonPartyIndex]) > NUM_CUTIES_RIBBONS)
+            if (GetMonData(&gPlayerParty[gContestMonPartyIndex], MON_DATA_RIBBON_COUNT, NULL) > NUM_CUTIES_RIBBONS)
                 TryPutSpotTheCutiesOnAir(&gPlayerParty[gContestMonPartyIndex], MON_DATA_COOL_RIBBON);
         }
         break;
@@ -1990,7 +1990,7 @@ void GiveMonContestRibbon(void)
         {
             ribbonData++;
             SetMonData(&gPlayerParty[gContestMonPartyIndex], MON_DATA_BEAUTY_RIBBON, &ribbonData);
-            if (GetRibbonCount(&gPlayerParty[gContestMonPartyIndex]) > NUM_CUTIES_RIBBONS)
+            if (GetMonData(&gPlayerParty[gContestMonPartyIndex], MON_DATA_RIBBON_COUNT, NULL) > NUM_CUTIES_RIBBONS)
                 TryPutSpotTheCutiesOnAir(&gPlayerParty[gContestMonPartyIndex], MON_DATA_BEAUTY_RIBBON);
         }
         break;
@@ -2000,7 +2000,7 @@ void GiveMonContestRibbon(void)
         {
             ribbonData++;
             SetMonData(&gPlayerParty[gContestMonPartyIndex], MON_DATA_CUTE_RIBBON, &ribbonData);
-            if (GetRibbonCount(&gPlayerParty[gContestMonPartyIndex]) > NUM_CUTIES_RIBBONS)
+            if (GetMonData(&gPlayerParty[gContestMonPartyIndex], MON_DATA_RIBBON_COUNT, NULL) > NUM_CUTIES_RIBBONS)
                 TryPutSpotTheCutiesOnAir(&gPlayerParty[gContestMonPartyIndex], MON_DATA_CUTE_RIBBON);
         }
         break;
@@ -2010,7 +2010,7 @@ void GiveMonContestRibbon(void)
         {
             ribbonData++;
             SetMonData(&gPlayerParty[gContestMonPartyIndex], MON_DATA_SMART_RIBBON, &ribbonData);
-            if (GetRibbonCount(&gPlayerParty[gContestMonPartyIndex]) > NUM_CUTIES_RIBBONS)
+            if (GetMonData(&gPlayerParty[gContestMonPartyIndex], MON_DATA_RIBBON_COUNT, NULL) > NUM_CUTIES_RIBBONS)
                 TryPutSpotTheCutiesOnAir(&gPlayerParty[gContestMonPartyIndex], MON_DATA_SMART_RIBBON);
         }
         break;
@@ -2020,7 +2020,7 @@ void GiveMonContestRibbon(void)
         {
             ribbonData++;
             SetMonData(&gPlayerParty[gContestMonPartyIndex], MON_DATA_TOUGH_RIBBON, &ribbonData);
-            if (GetRibbonCount(&gPlayerParty[gContestMonPartyIndex]) > NUM_CUTIES_RIBBONS)
+            if (GetMonData(&gPlayerParty[gContestMonPartyIndex], MON_DATA_RIBBON_COUNT, NULL) > NUM_CUTIES_RIBBONS)
                 TryPutSpotTheCutiesOnAir(&gPlayerParty[gContestMonPartyIndex], MON_DATA_TOUGH_RIBBON);
         }
         break;
@@ -2505,7 +2505,7 @@ bool8 GiveMonArtistRibbon(void)
     {
         hasArtistRibbon = 1;
         SetMonData(&gPlayerParty[gContestMonPartyIndex], MON_DATA_ARTIST_RIBBON, &hasArtistRibbon);
-        if (GetRibbonCount(&gPlayerParty[gContestMonPartyIndex]) > NUM_CUTIES_RIBBONS)
+        if (GetMonData(&gPlayerParty[gContestMonPartyIndex], MON_DATA_RIBBON_COUNT, NULL) > NUM_CUTIES_RIBBONS)
             TryPutSpotTheCutiesOnAir(&gPlayerParty[gContestMonPartyIndex], MON_DATA_ARTIST_RIBBON);
 
         return TRUE;

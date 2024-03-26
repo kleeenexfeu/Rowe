@@ -8,126 +8,95 @@
 #include "constants/pokemon_config.h"
 #include "constants/map_groups.h"
 
-struct PokemonSubstruct0
-{
-    /*0x00*/ u16 species:11;
-	         u16 formId:5;
-    /*0x02*/ u16 heldItem;
-    /*0x04*/ u32 experience;
-    /*0x08*/ u8 ppBonuses;
-    /*0x09*/ u8 friendship;
-    /*0x0A*/ u8 pokeball:5; //31 balls
-             u8 unused0_A:2;
-			 u8 exiolite:1;
-    /*0x0B*/ u8 hidden_nature;
-}; /* size = 12 */
-
-struct PokemonSubstruct1
-{
-    /*0x00*/ u16 moves[MAX_MON_MOVES];
-    /*0x08*/ u8 pp[MAX_MON_MOVES];
-}; /* size = 12 */
-
-struct PokemonSubstruct2
-{
-    /*0x00*/ u8 hpEV;
-    /*0x01*/ u8 attackEV;
-    /*0x02*/ u8 defenseEV;
-    /*0x03*/ u8 speedEV;
-    /*0x04*/ u8 spAttackEV;
-    /*0x05*/ u8 spDefenseEV;
-    /*0x06*/ u8 cool;
-    /*0x07*/ u8 beauty;
-    /*0x08*/ u8 cute;
-    /*0x09*/ u8 smart;
-    /*0x0A*/ u8 tough;
-    /*0x0B*/ u8 sheen;
-}; /* size = 12 */
-
-struct PokemonSubstruct3
-{
- /* 0x00 */ u8 pokerus;
- /* 0x01 */ u8 metLocation;
-
- /* 0x02 */ u16 metLevel:7;
- /* 0x02 */ u16 metGame:4;
- /* 0x03 */ u16 pokeballGen3:4;// For compatibility
- /* 0x03 */ u16 otGender:1;
-
- /* 0x04 */ u32 hpIV:5;
- /* 0x04 */ u32 attackIV:5;
- /* 0x05 */ u32 defenseIV:5;
- /* 0x05 */ u32 speedIV:5;
- /* 0x05 */ u32 spAttackIV:5;
- /* 0x06 */ u32 spDefenseIV:5;
- /* 0x07 */ u32 isEgg:1;
-
- /* 0x08 */ u32 coolRibbon:3;
- /* 0x08 */ u32 beautyRibbon:3;
- /* 0x08 */ u32 cuteRibbon:3;
- /* 0x09 */ u32 smartRibbon:3;
- /* 0x09 */ u32 toughRibbon:3;
- /* 0x09 */ u32 championRibbon:1;
- /* 0x0A */ u32 winningRibbon:1;
- /* 0x0A */ u32 victoryRibbon:1;
- /* 0x0A */ u32 artistRibbon:1;
- /* 0x0A */ u32 effortRibbon:1;
- /* 0x0A */ u32 giftRibbon1:1;
- /* 0x0A */ u32 giftRibbon2:1;
- /* 0x0A */ u32 giftRibbon3:1;
- /* 0x0A */ u32 giftRibbon4:1;
- /* 0x0B */ u32 giftRibbon5:1;
- /* 0x0B */ u32 giftRibbon6:1;
- /* 0x0B */ u32 giftRibbon7:1;
- /* 0x0B */ u32 fatefulEncounter:2;
- /* 0x0B */ u32 abilityNum:2;
- /* 0x0B */ u32 obedient:1;
-}; /* size = 12 */
-
-union PokemonSubstruct
-{
-    struct PokemonSubstruct0 type0;
-    struct PokemonSubstruct1 type1;
-    struct PokemonSubstruct2 type2;
-    struct PokemonSubstruct3 type3;
-    u16 raw[6];
-};
-
 struct BoxPokemon
 {
     u32 personality;
     u32 otId;
+    u32 experience:24;
+    u32 friendship:8;
+    
+    u16 species;
+    u16 heldItem;
+    
+    u16 move1;
+    u16 move2;
+    u16 move3;
+    u16 move4;
+
+    u8 hpEV;
+    u8 attackEV;
+    u8 defenseEV;
+    u8 speedEV;
+    u8 spAttackEV;
+    u8 spDefenseEV;
+    
+    u32 hpIV:5;
+    u32 attackIV:5;
+    u32 defenseIV:5;
+    u32 speedIV:5;
+    u32 spAttackIV:5;
+    u32 spDefenseIV:5;
+    u32 abilityNum:2;
+    
+    u16 customAbility:9;
+    u16 hidden_nature:5;
+    
+    u8 customHp;
+    u8 customAtk;
+    u8 customDef;
+    u8 customSpeed;
+    u8 customSpAtk;
+    u8 customSpDef;
+    u8 customType1;
+    u8 customType2;
+    
+    u16 formId:5;
+    u16 pokeball:5; //31 balls
+    u16 pokeballGen3:4;// For compatibility 
+    u16 isEgg:1;
+    u16 exiolite:1;
+
+    u8 ppBonuses;
+    
+    u8 ppmove1;
+    u8 ppmove2;
+    u8 ppmove3;
+    u8 ppmove4;
+    u8 metLocation;
+    u8 pokerus;
     u8 nickname[POKEMON_NAME_LENGTH];
-    u8 language;
-    u8 isBadEgg:1;
-    u8 hasSpecies:1;
-    u8 isEgg:1;
-    u8 unused:5;
     u8 otName[PLAYER_NAME_LENGTH];
     u8 markings;
-    u16 checksum;
-    u16 unknown;
 
-    union
-    {
-        u32 raw[12];
-        union PokemonSubstruct substructs[4];
-    } secure;
+    u8 cool;
+    u8 beauty;
+    u8 cute;
+    u8 smart;
+    u8 tough;
+
+    u32 coolRibbon:3;
+    u32 beautyRibbon:3; 
+    u32 cuteRibbon:3; 
+    u32 smartRibbon:3; 
+    u32 toughRibbon:3;
+    u32 championRibbon:1;
+    u32 winningRibbon:1;
+    u32 victoryRibbon:1;
+    u32 artistRibbon:1;
+    u32 effortRibbon:1;
+    u32 metLevel:7;
+    u32 otGender:1;
+    u32 isTainerMon:1;
+    u32 fillerAgain:3;
 };
 
 struct Pokemon
 {
     struct BoxPokemon box;
-    u32 status;
-    u8 level;
-    u8 mail;
+    u16 status; // u16 probably enough, because only non-volatile statuses are stored here, rest is only for the BattleMons structure
     u16 hp;
     u16 maxHP;
-    u16 attack;
-    u16 defense;
-    u16 speed;
-    u16 spAttack;
-    u16 spDefense;
+    u8 level;
 };
 
 struct CompressedBattlemon
@@ -173,40 +142,155 @@ struct CompressedPlayerParty
     u8 title:5;
 };
 
+// Passwords pokemon will be messed up because of how the structure was changed
 struct CompressedPokemon
 {
     /* 0x00 */ u32 personality;
     /* 0x04 */ u32 otId;
     /* 0x08 */ u8 otName[PLAYER_NAME_LENGTH];
-    /* 0x10 */ u16 species:11;
-    /* 0x10 */ u16 formId:5;
-    /* 0x10 */ u16 heldItem:10;
-    /* 0x13 */ u16 nature:5;
-    /* 0x10 */ u16 exiolite:1;
-    /* 0x14 */ u32 hpIV:5;
-    /* 0x14 */ u32 attackIV:5;
-    /* 0x14 */ u32 defenseIV:5;
-    /* 0x14 */ u32 spAttackIV:5;
-    /* 0x14 */ u32 spDefenseIV:5;
-    /* 0x14 */ u32 speedIV:5;
-    /* 0x14 */ u32 otGender:1;
-    /* 0x14 */ u32 unused1:1;
-    /* 0x18 */ u8 hpEV;
-    /* 0x19 */ u8 attackEV;
-    /* 0x1A */ u8 defenseEV;
-    /* 0x1B */ u8 speedEV;
-    /* 0x1C */ u8 spAttackEV;
-    /* 0x1D */ u8 spDefenseEV;
-    /* 0x1E */ u8 level:7;
-    /* 0x14 */ u8 unused2:1;
-    /* 0x1F */ u32 moves1:10;
-    /* 0x1F */ u32 moves2:10;
-    /* 0x1F */ u32 moves3:10;
-    /* 0x1F */ u32 abilityNum:2;
-    /* 0x1F */ u16 moves4:10;
-    /* 0x12 */ u16 pokeball:5;
-    /* 0x1F */ u16 unused3:1;
-    /* 0x27 */ 
+
+    u32 species:11;
+    u32 customAbility:9;
+    u32 heldItem:10;
+    u32 exiolite:1;
+    u32 isTrainerMon:1;
+
+    u32 moves1:10;
+    u32 moves2:10;
+    u32 moves3:10;
+    u32 abilityNum:2;
+
+    u32 hpIV:5;
+    u32 attackIV:5;
+    u32 defenseIV:5;
+    u32 spAttackIV:5;
+    u32 spDefenseIV:5;
+    u32 speedIV:5;
+    u32 otGender:1;
+    u32 filler:1;
+
+    u32 level:7;
+    u32 moves4:10;
+    u32 pokeball:5;
+    u32 nature:5;
+    u32 formId:5;
+
+    u8 hpEV;
+    u8 attackEV;
+    u8 defenseEV;
+    u8 speedEV;
+
+    u8 spAttackEV;
+    u8 spDefenseEV;
+    u8 customHp;
+    u8 customAtk;
+
+    u8 customDef;
+    u8 customSpeed;
+    u8 customSpAtk;
+    u8 customSpDef;
+
+    u8 customType1;
+    u8 customType2;
+};
+
+// Flags for Get(Box)MonData / Set(Box)MonData
+enum {
+    MON_DATA_PERSONALITY,
+    MON_DATA_OT_ID,
+    MON_DATA_NICKNAME,
+    MON_DATA_LANGUAGE,
+    MON_DATA_SANITY_IS_BAD_EGG,
+    MON_DATA_SANITY_HAS_SPECIES,
+    MON_DATA_SANITY_IS_EGG,
+    MON_DATA_OT_NAME,
+    MON_DATA_MARKINGS,
+    MON_DATA_SPECIES,
+    MON_DATA_HELD_ITEM,
+    MON_DATA_MOVE1,
+    MON_DATA_MOVE2,
+    MON_DATA_MOVE3,
+    MON_DATA_MOVE4,
+    MON_DATA_PP1,
+    MON_DATA_PP2,
+    MON_DATA_PP3,
+    MON_DATA_PP4,
+    MON_DATA_PP_BONUSES,
+    MON_DATA_COOL,
+    MON_DATA_BEAUTY,
+    MON_DATA_CUTE,
+    MON_DATA_EXP,
+    MON_DATA_HP_EV,
+    MON_DATA_ATK_EV,
+    MON_DATA_DEF_EV,
+    MON_DATA_SPEED_EV,
+    MON_DATA_SPATK_EV,
+    MON_DATA_SPDEF_EV,
+    MON_DATA_FRIENDSHIP,
+    MON_DATA_SMART,
+    MON_DATA_POKERUS,
+    MON_DATA_MET_LOCATION,
+    MON_DATA_MET_LEVEL,
+    MON_DATA_MET_GAME,
+    MON_DATA_POKEBALL,
+    MON_DATA_HP_IV,
+    MON_DATA_ATK_IV,
+    MON_DATA_DEF_IV,
+    MON_DATA_SPEED_IV,
+    MON_DATA_SPATK_IV,
+    MON_DATA_SPDEF_IV,
+    MON_DATA_IS_EGG,
+    MON_DATA_ABILITY_NUM,
+    MON_DATA_TOUGH,
+    MON_DATA_SHEEN,
+    MON_DATA_OT_GENDER,
+    MON_DATA_COOL_RIBBON,
+    MON_DATA_BEAUTY_RIBBON,
+    MON_DATA_CUTE_RIBBON,
+    MON_DATA_SMART_RIBBON,
+    MON_DATA_TOUGH_RIBBON,
+    MON_DATA_STATUS,
+    MON_DATA_LEVEL,
+    MON_DATA_HP,
+    MON_DATA_MAX_HP,
+    MON_DATA_ATK,
+    MON_DATA_DEF,
+    MON_DATA_SPEED,
+    MON_DATA_SPATK,
+    MON_DATA_SPDEF,
+    MON_DATA_MAIL,
+    MON_DATA_SPECIES2,
+    MON_DATA_IVS,
+    MON_DATA_CHAMPION_RIBBON,
+    MON_DATA_WINNING_RIBBON,
+    MON_DATA_VICTORY_RIBBON,
+    MON_DATA_ARTIST_RIBBON,
+    MON_DATA_EFFORT_RIBBON,
+    MON_DATA_OBEDIENCE,
+    MON_DATA_RIBBON_COUNT,
+    MON_DATA_RIBBONS,
+    MON_DATA_ATK2,
+    MON_DATA_DEF2,
+    MON_DATA_SPEED2,
+    MON_DATA_SPATK2,
+    MON_DATA_SPDEF2,
+    MON_DATA_HIDDEN_NATURE,
+    MON_DATA_CUSTOM_HP,
+    MON_DATA_CUSTOM_ATK,
+    MON_DATA_CUSTOM_DEF,
+    MON_DATA_CUSTOM_SPEED,
+    MON_DATA_CUSTOM_SPATK,
+    MON_DATA_CUSTOM_SPDEF,
+    MON_DATA_CUSTOM_ABILITY,
+    MON_DATA_CUSTOM_TYPE1,
+    MON_DATA_CUSTOM_TYPE2,
+    MON_DATA_ABILITY,
+    MON_DATA_TYPE1,
+    MON_DATA_TYPE2,
+    MON_DATA_KNOWN_MOVES,
+    MON_DATA_EXIOLITE_ENABLED,
+    MON_DATA_FORM_ID,
+    MON_DATA_IS_TRAINER_MON, // in new game +, trainers mon' stats are calculated a little different
 };
 
 struct Unknown_806F160_Struct
@@ -522,7 +606,6 @@ u16 GetUnionRoomTrainerPic(void);
 u16 GetUnionRoomTrainerClass(void);
 void CreateObedientEnemyMon(void);
 void CalculateMonStats(struct Pokemon *mon);
-void CalculateTrainerMonStats(struct Pokemon *mon);
 void BoxMonToMon(const struct BoxPokemon *src, struct Pokemon *dest);
 u8 GetLevelFromMonExp(struct Pokemon *mon);
 u8 GetLevelFromBoxMonExp(struct BoxPokemon *boxMon);
@@ -556,6 +639,11 @@ void SetMultiuseSpriteTemplateToTrainerFront(u16 arg0, u8 battlerPosition);
 // u32 GetBoxMonData(struct BoxPokemon *boxMon, s32 field, u8 *data);
 u32 GetMonData();
 u32 GetBoxMonData();
+
+// New functions coming with Dynamic Type, Abilities, Base Stats
+struct Pokemon *GetBattlerPartyData(u8 battlerId);
+u8 GetSpeciesBaseStat(struct Pokemon *mon, u8 statIndex);
+
 
 void SetMonData(struct Pokemon *mon, s32 field, const void *dataArg);
 void SetBoxMonData(struct BoxPokemon *boxMon, s32 field, const void *dataArg);
@@ -673,7 +761,7 @@ u8 GetFormIdFromFormSpeciesId(u16 formSpeciesId);
 u16 GetBaseFormSpeciesId(u16 formSpeciesId);
 void CreateShinyMonWithNature(struct Pokemon *mon, u16 species, u8 level, u8 nature);
 u16 MonTryLearningNewMoveEvolution(struct Pokemon *mon, bool8 firstMove);
-bool8 SpeciesHasType(u16 species, u8 type);
+bool8 PartyMonHasType(struct Pokemon *mon, u8 type);
 u16 GetRandomFirstStage(u16 basespecies);
 u16 GetGrowthRate(u16 formSpeciesId);
 u16 GetExioliteSpecies(u16 basespecies, u8 level);

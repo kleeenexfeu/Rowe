@@ -2454,7 +2454,7 @@ bool8 ScrFunc_getfolloweraction(struct ScriptContext *ctx) // Essentially a big 
 {
 	  u16 value;
 	  u16 species;
-	  u8 ability;
+	  u16 ability;
 	  u32 behavior;
 	  s16 health_percent;
 	  u8 map_region;
@@ -2473,20 +2473,20 @@ bool8 ScrFunc_getfolloweraction(struct ScriptContext *ctx) // Essentially a big 
 		ScriptJump(ctx, EventScript_FollowerEnd);
 	  behavior = MapGridGetMetatileBehaviorAt(objEvent->currentCoords.x, objEvent->currentCoords.y);
 	  species = GetMonData(mon, MON_DATA_SPECIES);
-	  ability = gBaseStats[species].abilities[GetMonData(mon, MON_DATA_ABILITY_NUM)];
+	  ability = GetMonAbility(mon);
 	  // 1. Puddle splash or wet feet
 	  if (MetatileBehavior_IsPuddle(behavior) || MetatileBehavior_IsShallowFlowingWater(behavior)) {
-		if (SpeciesHasType(species, TYPE_FIRE))
+		if (PartyMonHasType(mon, TYPE_FIRE))
 		  message_choices[n_choices++] = EventScript_FollowerUnhappyToBeWet;
 		else //if (SpeciesToGraphicsInfo(species, 0)->tracks) // if follower is grounded
 		  message_choices[n_choices++] = EventScript_FollowerSplashesAbout;
 	  }
 	  // 2. Weather-based messages
 	  if (GetCurrentWeather() == WEATHER_RAIN || GetCurrentWeather() == WEATHER_RAIN_THUNDERSTORM) {
-		if (SpeciesHasType(species, TYPE_FIRE))
+		if (PartyMonHasType(mon, TYPE_FIRE))
 		  message_choices[n_choices++] = EventScript_FollowerUnhappyFace;
-		else if (SpeciesHasType(species, TYPE_WATER)	||
-			     SpeciesHasType(species, TYPE_GRASS)	||
+		else if (PartyMonHasType(mon, TYPE_WATER)	||
+			     PartyMonHasType(mon, TYPE_GRASS)	||
 			     ability == ABILITY_RAIN_DISH			||
 				 ability == ABILITY_DRY_SKIN			||
 				 ability == ABILITY_HYDRATION			||
@@ -2496,21 +2496,21 @@ bool8 ScrFunc_getfolloweraction(struct ScriptContext *ctx) // Essentially a big 
 		  message_choices[n_choices++] = EventScript_FollowerHappyRain;
 	  }
 	  if (GetCurrentWeather() == WEATHER_SNOW) {
-		  if ((SpeciesHasType(species, TYPE_DRAGON) && 
-			  (SpeciesHasType(species, TYPE_GROUND) 	|| 
-			   SpeciesHasType(species, TYPE_FLYING)))||
-			  (SpeciesHasType(species, TYPE_GROUND) && 
-			   SpeciesHasType(species, TYPE_FLYING)))
+		  if ((PartyMonHasType(mon, TYPE_DRAGON) && 
+			  (PartyMonHasType(mon, TYPE_GROUND) 	|| 
+			   PartyMonHasType(mon, TYPE_FLYING)))||
+			  (PartyMonHasType(mon, TYPE_GROUND) && 
+			   PartyMonHasType(mon, TYPE_FLYING)))
 				message_choices[n_choices++] = EventScript_FollowerDislikesThisPlace;
-		  if (SpeciesHasType(species, TYPE_ICE)		||
+		  if (PartyMonHasType(mon, TYPE_ICE)		||
 			  ability == ABILITY_ICE_BODY			||
 			  ability == ABILITY_SLUSH_RUSH)
 				message_choices[n_choices++] = EventScript_FollowerHappySnow;
 	  }
 	  if (GetCurrentWeather() == WEATHER_SANDSTORM) {
-		  if (SpeciesHasType(species, TYPE_GROUND)	||
-			  SpeciesHasType(species, TYPE_ROCK)	||
-			  SpeciesHasType(species, TYPE_STEEL)	||
+		  if (PartyMonHasType(mon, TYPE_GROUND)	||
+			  PartyMonHasType(mon, TYPE_ROCK)	||
+			  PartyMonHasType(mon, TYPE_STEEL)	||
 			  ability == ABILITY_SAND_FORCE			||
 			  ability == ABILITY_SAND_RUSH			||
 			  ability == ABILITY_SAND_VEIL			||

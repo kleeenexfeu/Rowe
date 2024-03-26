@@ -2369,7 +2369,7 @@ void TryPutSpotTheCutiesOnAir(struct Pokemon *pokemon, u8 ribbonMonDataIdx)
         StringCopy(show->cuties.playerName, gSaveBlock2Ptr->playerName);
         GetMonData(pokemon, MON_DATA_NICKNAME, show->cuties.nickname);
         StripExtCtrlCodes(show->cuties.nickname);
-        show->cuties.nRibbons = GetRibbonCount(pokemon);
+        show->cuties.nRibbons = GetMonData(pokemon, MON_DATA_RIBBON_COUNT, NULL);
         show->cuties.selectedRibbon = TV_MonDataIdxToRibbon(ribbonMonDataIdx);
         tv_store_id_3x(show);
         show->cuties.language = gGameLanguage;
@@ -2384,31 +2384,6 @@ void TryPutSpotTheCutiesOnAir(struct Pokemon *pokemon, u8 ribbonMonDataIdx)
     }
 }
 
-u8 GetRibbonCount(struct Pokemon *pokemon)
-{
-    u8 nRibbons;
-
-    nRibbons = 0;
-    nRibbons += GetMonData(pokemon, MON_DATA_COOL_RIBBON);
-    nRibbons += GetMonData(pokemon, MON_DATA_BEAUTY_RIBBON);
-    nRibbons += GetMonData(pokemon, MON_DATA_CUTE_RIBBON);
-    nRibbons += GetMonData(pokemon, MON_DATA_SMART_RIBBON);
-    nRibbons += GetMonData(pokemon, MON_DATA_TOUGH_RIBBON);
-    nRibbons += GetMonData(pokemon, MON_DATA_CHAMPION_RIBBON);
-    nRibbons += GetMonData(pokemon, MON_DATA_WINNING_RIBBON);
-    nRibbons += GetMonData(pokemon, MON_DATA_VICTORY_RIBBON);
-    nRibbons += GetMonData(pokemon, MON_DATA_ARTIST_RIBBON);
-    nRibbons += GetMonData(pokemon, MON_DATA_EFFORT_RIBBON);
-    nRibbons += GetMonData(pokemon, MON_DATA_GIFT_RIBBON_1);
-    nRibbons += GetMonData(pokemon, MON_DATA_GIFT_RIBBON_2);
-    nRibbons += GetMonData(pokemon, MON_DATA_GIFT_RIBBON_3);
-    nRibbons += GetMonData(pokemon, MON_DATA_GIFT_RIBBON_4);
-    nRibbons += GetMonData(pokemon, MON_DATA_GIFT_RIBBON_5);
-    nRibbons += GetMonData(pokemon, MON_DATA_GIFT_RIBBON_6);
-    nRibbons += GetMonData(pokemon, MON_DATA_GIFT_RIBBON_7);
-    return nRibbons;
-}
-
 u8 TV_MonDataIdxToRibbon(u8 monDataIdx)
 {
     if (monDataIdx == MON_DATA_CHAMPION_RIBBON) return  0;
@@ -2421,13 +2396,6 @@ u8 TV_MonDataIdxToRibbon(u8 monDataIdx)
     if (monDataIdx == MON_DATA_VICTORY_RIBBON)  return 22;
     if (monDataIdx == MON_DATA_ARTIST_RIBBON)   return 23;
     if (monDataIdx == MON_DATA_EFFORT_RIBBON)   return 24;
-    if (monDataIdx == MON_DATA_GIFT_RIBBON_1)   return 25;
-    if (monDataIdx == MON_DATA_GIFT_RIBBON_2)   return 26;
-    if (monDataIdx == MON_DATA_GIFT_RIBBON_3)   return 27;
-    if (monDataIdx == MON_DATA_GIFT_RIBBON_4)   return 28;
-    if (monDataIdx == MON_DATA_GIFT_RIBBON_5)   return 29;
-    if (monDataIdx == MON_DATA_GIFT_RIBBON_6)   return 30;
-    if (monDataIdx == MON_DATA_GIFT_RIBBON_7)   return 31;
     return 0;
 }
 
